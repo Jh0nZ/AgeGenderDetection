@@ -118,5 +118,5 @@ history = model.fit(
 )
 
 # Guardar el modelo entrenado
-model.save("gender_age_model.h5")
-print("Modelo entrenado y guardado como 'gender_age_model.h5'")
+model.save("gender_age_model.keras")
+print("Modelo entrenado y guardado como 'gender_age_model.keras'")

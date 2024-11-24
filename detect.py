@@ -6,16 +6,16 @@ from tensorflow.keras.losses import BinaryCrossentropy, MeanSquaredError
 
 # Cargar el modelo entrenado y el escalador
 model = load_model(
-    "gender_age_model.h5",
+    "gender_age_model_v1.h5",
     custom_objects={
         "binary_crossentropy": BinaryCrossentropy(),
         "mse": MeanSquaredError()
     }
 )
-scaler = joblib.load("scaler.pkl")
+scaler = joblib.load("scaler_v1.pkl")
 
 # Configuración
-img_size = (128, 128)  # Debe coincidir con el tamaño usado durante el entrenamiento
+img_size = (128, 128)  # el tamaño usado durante el entrenamiento
 
 # Función para predecir género y edad
 def predict_new_image(image_path):
@@ -27,10 +27,11 @@ def predict_new_image(image_path):
     gender_pred, age_pred = model.predict(img_array)
     gender = "Mujer" if gender_pred[0] > 0.5 else "Hombre"
     age = scaler.inverse_transform(age_pred)[0][0]
+    print(f"Prediccion: Género: {gender_pred} Edad: {age_pred}")
     
     return gender, round(age)
 
 # Usar la función para predecir
-new_image_path = "girl.jpg"  # Cambia esto a la imagen que quieras probar
+new_image_path = "test/man.jpg"
 gender, age = predict_new_image(new_image_path)
-print(f"Género: {gender}, Edad: {age}")
+print(f"Género: {gender}, Edad: {age}", )
