@@ -1,8 +1,11 @@
+import os
 import numpy as np
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 import joblib
 from tensorflow.keras.losses import BinaryCrossentropy, MeanSquaredError
+import tkinter as tk
+from tkinter import filedialog
 
 # Cargar el modelo entrenado y el escalador
 model = load_model(
@@ -31,7 +34,23 @@ def predict_new_image(image_path):
     
     return gender, round(age)
 
+def open_file_dialog():
+    root = tk.Tk()
+    root.withdraw()  # Ocultar la ventana principal de Tkinter
+    file_path = filedialog.askopenfilename(
+        title="Selecciona una imagen",
+        filetypes=[("Archivos de imagen", "*.jpg;*.jpeg;*.png")],
+        initialdir="./test"
+        
+    )
+    return file_path
+
 # Usar la función para predecir
-new_image_path = "test/man.jpg"
-gender, age = predict_new_image(new_image_path)
-print(f"Género: {gender}, Edad: {age}", )
+new_image_path = open_file_dialog()  # Abrir el explorador de archivos
+if new_image_path:
+    image_name = os.path.basename(new_image_path)
+    print(f"Imagen seleccionada: {image_name}")
+    gender, age = predict_new_image(new_image_path)
+    print(f"Género: {gender}, Edad: {age}")
+else:
+    print("No se seleccionó ninguna imagen.")
