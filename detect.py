@@ -9,13 +9,13 @@ from tkinter import filedialog
 
 # Cargar el modelo entrenado y el escalador
 model = load_model(
-    "gender_age_model_v1.h5",
+    "gender_age_model.keras",
     custom_objects={
         "binary_crossentropy": BinaryCrossentropy(),
         "mse": MeanSquaredError()
     }
 )
-scaler = joblib.load("scaler_v1.pkl")
+scaler = joblib.load("scaler.pkl")
 
 # Configuración
 img_size = (128, 128)  # el tamaño usado durante el entrenamiento

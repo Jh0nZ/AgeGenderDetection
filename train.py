@@ -114,7 +114,7 @@ history = model.fit(
     X_train, {'gender_output': gender_train, 'age_output': age_train},
     validation_data=(X_val, {'gender_output': gender_val, 'age_output': age_val}),
     batch_size=batch_size,
-    epochs=20
+    epochs=60
 )
 
 # Guardar el modelo entrenado
