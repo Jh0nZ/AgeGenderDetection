@@ -11,19 +11,30 @@ from PIL import Image, ImageTk
 # Configuración
 img_size = (128, 128)  # el tamaño usado durante el entrenamiento
 model = None
-scaler = joblib.load("scaler.pkl")
+scaler = None  # Inicializar el escalador como None
 
-# Función para cargar el modelo
+# Función para cargar el modelo y el escalador
 def load_selected_model(model_name):
-    global model
+    global model, scaler
+    model_path = os.path.join("models", model_name)
+    scaler_path = os.path.join("scales", model_name.replace('.keras', '.pkl'))  # Cambia la extensión a .pkl
+
+    # Cargar el modelo
     model = load_model(
-        os.path.join("models", model_name),
+        model_path,
         custom_objects={
             "binary_crossentropy": BinaryCrossentropy(),
             "mse": MeanSquaredError()
         }
     )
     print(f"Modelo cargado: {model_name}")
+    
+    # Cargar el escalador
+    if os.path.exists(scaler_path):
+        scaler = joblib.load(scaler_path)
+        print(f"Escalador cargado: {scaler_path}")
+    else:
+        print(f"No se encontró el escalador en: {scaler_path}")
 
 # Función para predecir género y edad
 def predict_new_image(image_path):
@@ -34,8 +45,8 @@ def predict_new_image(image_path):
     # Predecir
     gender_pred, age_pred = model.predict(img_array)
     gender = "Mujer" if gender_pred[0] > 0.5 else "Hombre"
-    age = scaler.inverse_transform(age_pred)[0][0]
-    
+    age = scaler.inverse_transform(age_pred.reshape(-1, 1))[0][0] if scaler is not None else age_pred[0][0]
+    print(f"Predicción gender_pred: {gender_pred} age_pred: {age_pred}")
     return gender, round(age)
 
 # Función para mostrar la imagen seleccionada

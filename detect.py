@@ -29,7 +29,7 @@ def predict_new_image(image_path):
     # Predecir
     gender_pred, age_pred = model.predict(img_array)
     gender = "Mujer" if gender_pred[0] > 0.5 else "Hombre"
-    age = scaler.inverse_transform(age_pred)[0][0]
+    age = scaler.inverse_transform(age_pred.reshape(-1, 1))[0][0]
     print(f"Prediccion: Género: {gender_pred} Edad: {age_pred}")
     
     return gender, round(age)
