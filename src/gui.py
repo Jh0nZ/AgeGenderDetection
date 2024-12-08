@@ -26,6 +26,10 @@ def create_gui(root):
     frame_right = tk.Frame(root)
     frame_right.pack(side=tk.RIGHT, padx=10, pady=10)
 
+    # Agregar un label que diga "Modelo"
+    model_label = tk.Label(frame_right, text="Modelo:")
+    model_label.pack(pady=(10, 0))  # Espaciado superior, sin espaciado inferior
+
     modelos = os.listdir("models")
     model_selector = ttk.Combobox(frame_right, values=modelos)
     model_selector.pack(pady=10)
@@ -46,6 +50,5 @@ def create_gui(root):
         canvas.yview_scroll(-1 * (event.delta // 120), "units")  # Ajustar el desplazamiento
 
     scrollbar.bind_all("<MouseWheel>", on_mouse_wheel)
-
 
     load_images(scrollable_frame, preview_label, result_label)
