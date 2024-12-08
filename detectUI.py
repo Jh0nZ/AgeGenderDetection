@@ -87,6 +87,14 @@ def load_images():
                 img_label.pack(side=tk.LEFT, padx=5, pady=5)
                 img_label.bind("<Button-1>", lambda e, path=img_path: show_selected_image(path))
 
+
+def adjust_combobox_width(combobox, values):
+    # Determina el ancho máximo necesario para mostrar los valores
+    max_length = max(len(str(value)) for value in values)
+    # Ajusta el ancho del Combobox (aproximado a caracteres promedio)
+    combobox.config(width=max_length)
+
+
 # Crear la ventana principal
 root = tk.Tk()
 root.title("Predicción de Género y Edad")
@@ -124,8 +132,10 @@ frame_right = tk.Frame(root)
 frame_right.pack(side=tk.RIGHT, padx=10, pady=10)
 
 # Selector de modelos
+modelos = os.listdir("models")
 model_selector = ttk.Combobox(frame_right, values=os.listdir("models"))
 model_selector.pack(pady=10)
+adjust_combobox_width(model_selector, modelos)
 model_selector.bind("<<ComboboxSelected>>", lambda e: load_selected_model(model_selector.get()))
 
 # Label para la vista previa de la imagen seleccionada
