@@ -12,8 +12,8 @@ from datetime import datetime
 # Configuración inicial
 image_dir = "images"
 img_size = (128, 128)  # Tamaño al que redimensionaremos las imágenes
-batch_size = 32
-EPOCHS = 1
+batch_size = 64
+EPOCHS = 32
 
 # Leer imágenes y etiquetas
 def load_data(image_dir):
