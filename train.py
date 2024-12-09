@@ -10,10 +10,10 @@ import joblib
 from datetime import datetime
 
 # Configuración inicial
-image_dir = "images"
+image_dir = "images_old"
 img_size = (128, 128)  # Tamaño al que redimensionaremos las imágenes
-batch_size = 64
-EPOCHS = 32
+batch_size = 32
+EPOCHS = 16
 
 # Leer imágenes y etiquetas
 def load_data(image_dir):
