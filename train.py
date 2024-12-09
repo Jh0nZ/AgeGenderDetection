@@ -31,12 +31,10 @@ def load_data(image_dir):
                 try:
                     age = int(parts[0])  # Edad
                     gender = int(parts[1])  # Género (0 o 1)
-                    
                     # Validar que el género sea 0 o 1
                     if gender not in [0, 1]:
                         print(f"Archivo con género inválido: {filename}. Se espera 0 o 1.")
                         continue
-                    
                     # Cargar y preprocesar la imagen
                     img_path = os.path.join(image_dir, filename)
                     img = load_img(img_path, target_size=img_size)
@@ -63,7 +61,7 @@ ages = scaler.fit_transform(ages.reshape(-1, 1))
 
 # Dividir en conjuntos de entrenamiento y validación
 X_train, X_val, gender_train, gender_val, age_train, age_val = train_test_split(
-    images, genders, ages, test_size=0.2, random_state=42
+    images, genders, ages, test_size=0.5, random_state=42
 )
 
 # Crear el modelo
