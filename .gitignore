@@ -1,3 +1,5 @@
 venv
 images/*
 venv_cpu
+images_old
+*__pycache__

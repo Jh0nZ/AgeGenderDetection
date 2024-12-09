@@ -6,11 +6,14 @@ from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense,
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
+import joblib
+from datetime import datetime
 
 # Configuración inicial
 image_dir = "images"
 img_size = (128, 128)  # Tamaño al que redimensionaremos las imágenes
 batch_size = 32
+EPOCHS = 16
 
 # Leer imágenes y etiquetas
 def load_data(image_dir):
@@ -28,12 +31,10 @@ def load_data(image_dir):
                 try:
                     age = int(parts[0])  # Edad
                     gender = int(parts[1])  # Género (0 o 1)
-                    
                     # Validar que el género sea 0 o 1
                     if gender not in [0, 1]:
                         print(f"Archivo con género inválido: {filename}. Se espera 0 o 1.")
                         continue
-                    
                     # Cargar y preprocesar la imagen
                     img_path = os.path.join(image_dir, filename)
                     img = load_img(img_path, target_size=img_size)
@@ -58,13 +59,9 @@ images, genders, ages = load_data(image_dir)
 scaler = MinMaxScaler()
 ages = scaler.fit_transform(ages.reshape(-1, 1))
 
-# Guardar el escalador para predecir después
-import joblib
-joblib.dump(scaler, "scaler.pkl")
-
 # Dividir en conjuntos de entrenamiento y validación
 X_train, X_val, gender_train, gender_val, age_train, age_val = train_test_split(
-    images, genders, ages, test_size=0.2, random_state=42
+    images, genders, ages, test_size=0.5, random_state=42
 )
 
 # Crear el modelo
@@ -114,9 +111,37 @@ history = model.fit(
     X_train, {'gender_output': gender_train, 'age_output': age_train},
     validation_data=(X_val, {'gender_output': gender_val, 'age_output': age_val}),
     batch_size=batch_size,
-    epochs=60
+    epochs=EPOCHS
 )
 
-# Guardar el modelo entrenado
-model.save("gender_age_model.keras")
-print("Modelo entrenado y guardado como 'gender_age_model.keras'")
+def save_trained_model(model, scaler):
+    # Crear el directorio 'models' si no existe
+    if not os.path.exists("models"):
+        os.makedirs("models")
+        
+    if not os.path.exists("scales"):
+        os.makedirs("scales")
+    
+    # Generar un timestamp
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    model_name = f"gender_age_model_{timestamp}.keras"
+    model_path = os.path.join("models", model_name)
+    
+    # Guardar el escalador para predecir después
+    scale_name = f"gender_age_model_{timestamp}.pkl"
+    scale_path = os.path.join("scales", scale_name)
+    
+    # Guardar el modelo y el escalador
+    joblib.dump(scaler, scale_path)
+    model.save(model_path)
+    print(f"Modelo guardado en: {model_path}")
+    print(f"Escalador guardado en: {scale_path}")
+
+save_trained_model(model, scaler)
+
+loss, gender_loss, age_loss, gender_accuracy, age_mae = model.evaluate(
+    X_val, {'gender_output': gender_val, 'age_output': age_val}
+)
+
+print(f"Precisión en validación (género): {gender_accuracy:.2f}")
+print(f"Error medio absoluto en validación (edad): {age_mae:.2f}")
