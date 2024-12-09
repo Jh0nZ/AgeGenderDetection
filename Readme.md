@@ -50,6 +50,8 @@ python train.py
 ```
 Esto generará los modelos entrenados y los escaladores en los directorios `models/` y `scales/`, respectivamente.
 
+La precisión del modelo depende en gran medida de la calidad y diversidad de las imágenes de entrenamiento. Asegúrate de utilizar un conjunto de datos representativo para obtener mejores resultados.
+
 ## Ejecutar la Aplicación
 Una vez que hayas entrenado el modelo, puedes ejecutar la aplicación con el siguiente comando:
 
@@ -59,5 +61,5 @@ python src/app.py
 
 ## Uso de la Aplicación
 1. Selecciona un modelo entrenado desde el menú desplegable.
-2. Haz clic en "Recargar Imágenes" para cargar las imágenes de prueba desde el directorio test/.
+2. Haz clic en "Recargar Imágenes" para cargar las imágenes de prueba desde el directorio `test/` si agregas nuevas imagenes.
 3. Haz clic en una imagen para predecir el género y la edad.

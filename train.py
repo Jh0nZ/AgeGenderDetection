@@ -13,6 +13,7 @@ from datetime import datetime
 image_dir = "images"
 img_size = (128, 128)  # Tamaño al que redimensionaremos las imágenes
 batch_size = 32
+EPOCHS = 1
 
 # Leer imágenes y etiquetas
 def load_data(image_dir):
@@ -112,7 +113,7 @@ history = model.fit(
     X_train, {'gender_output': gender_train, 'age_output': age_train},
     validation_data=(X_val, {'gender_output': gender_val, 'age_output': age_val}),
     batch_size=batch_size,
-    epochs=24
+    epochs=EPOCHS
 )
 
 def save_trained_model(model, scaler):
@@ -139,3 +140,10 @@ def save_trained_model(model, scaler):
     print(f"Escalador guardado en: {scale_path}")
 
 save_trained_model(model, scaler)
+
+loss, gender_loss, age_loss, gender_accuracy, age_mae = model.evaluate(
+    X_val, {'gender_output': gender_val, 'age_output': age_val}
+)
+
+print(f"Precisión en validación (género): {gender_accuracy:.2f}")
+print(f"Error medio absoluto en validación (edad): {age_mae:.2f}")
