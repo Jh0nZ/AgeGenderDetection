@@ -60,7 +60,10 @@ scaler = MinMaxScaler()
 ages = scaler.fit_transform(ages.reshape(-1, 1))
 
 # Dividir en conjuntos de entrenamiento y validación
-ws
+X_train, X_val, gender_train, gender_val, age_train, age_val = train_test_split(
+    images, genders, ages, test_size=0.5, random_state=42
+)
+
 # Crear el modelo
 def create_model():
     input_layer = Input(shape=(img_size[0], img_size[1], 3))
