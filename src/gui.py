@@ -1,64 +1,69 @@
 import cv2
 import numpy as np
+from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
-from model_loader import get_model, get_scaler
+from tensorflow.keras.applications.imagenet_utils import preprocess_input
+import sys
 
-# Cargar modelo y escalador
-model = get_model()
-scaler = get_scaler()
-if model is None:
-    print("Modelo no cargado. Asegúrate de seleccionar un modelo válido.")
-    exit()
+# Asegurarse de que la salida estándar use UTF-8
+sys.stdout.reconfigure(encoding='utf-8')
+
+# Cargar el modelo de Keras
+modelo_path = "D:/progra/IAJHON/AgeGenderDetection/models/1000imagenes.keras"
+model = load_model(modelo_path)
+print(f"Modelo cargado desde: {modelo_path}")
 
 # Cargar el clasificador de rostros de OpenCV
-clasificadorRostros = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+clasificador_rostros = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
+# Función para predecir género y edad
 def predecir_genero_edad(rostro):
-    """Preprocesa el rostro y realiza la predicción de género y edad."""
-    rostro = cv2.resize(rostro, (128, 128))  # Redimensionar al tamaño que espera el modelo
+    rostro = cv2.resize(rostro, (128, 128))  # Tamaño que espera el modelo
     rostro = img_to_array(rostro) / 255.0  # Normalizar
-    rostro = np.expand_dims(rostro, axis=0)  # Añadir dimensión para batch
-    gender_pred, age_pred = model.predict(rostro)
+    rostro = np.expand_dims(rostro, axis=0)
+    
+    # Predicción
+    genero_pred, edad_pred = model.predict(rostro)
+    genero = "Mujer" if genero_pred[0] > 0.5 else "Hombre"
+    edad = int(edad_pred[0][0])  # Convertir predicción de edad a entero
+    return genero, edad
 
-    # Interpretar resultados
-    gender = "Mujer" if gender_pred[0] > 0.5 else "Hombre"
-    age = scaler.inverse_transform(age_pred.reshape(-1, 1))[0][0] if scaler is not None else age_pred[0][0]
-    return gender, int(age)
+captura = cv2.VideoCapture(0)  
 
-# Capturar video en tiempo real desde la cámara
-captura = cv2.VideoCapture(0)  # Usa 0 para la cámara integrada
 if not captura.isOpened():
-    print("No se pudo acceder a la cámara.")
+    print("Error al abrir la cámara.")
     exit()
-
-print("Presiona 'Esc' para salir.")
 
 while True:
     ret, frame = captura.read()
     if not ret:
-        print("No se pudo leer el cuadro de la cámara.")
         break
 
-    gris = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    rostros = clasificadorRostros.detectMultiScale(gris, 1.3, 5)
+    gris = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  # Convertir a escala de grises para la detección
+    rostros = clasificador_rostros.detectMultiScale(gris, scaleFactor=1.3, minNeighbors=5)
 
     for (x, y, w, h) in rostros:
-        rostro = frame[y:y + h, x:x + w]
-        gender, age = predecir_genero_edad(rostro)
+        rostro_color = frame[y:y + h, x:x + w]
+        
+        # Predicción de género y edad
+        genero, edad = predecir_genero_edad(rostro_color)
+
+        # Reemplazar caracteres no codificables (si hay) en el texto
+        texto = f"{genero}, {edad} anios".encode('ascii', 'ignore').decode('ascii')
 
         # Dibujar rectángulo alrededor del rostro
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-        # Mostrar texto con género y edad
-        texto = f"{gender}, {age} años"
-        cv2.putText(frame, texto, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+        # Mostrar resultados de género y edad en el rectángulo
+        cv2.putText(frame, texto, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
 
-    # Mostrar el cuadro con los resultados
+    # Mostrar el video con detecciones
     cv2.imshow('Detección de Género y Edad', frame)
 
-    # Salir al presionar 'Esc'
+    # Salir con la tecla 'Esc'
     if cv2.waitKey(1) & 0xFF == 27:
         break
 
+# Liberar recursos
 captura.release()
 cv2.destroyAllWindows()
