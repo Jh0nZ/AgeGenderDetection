@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from model_loader import get_model, get_scaler
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.applications.imagenet_utils import preprocess_input
@@ -23,11 +24,10 @@ def predecir_genero_edad(rostro):
     rostro = cv2.resize(rostro, (128, 128))  # Tamaño que espera el modelo
     rostro = img_to_array(rostro) / 255.0  # Normalizar
     rostro = np.expand_dims(rostro, axis=0)
-    
-    # Predicción
     genero_pred, edad_pred = model.predict(rostro)
     genero = "Mujer" if genero_pred[0] > 0.5 else "Hombre"
-    edad = int(edad_pred[0][0])  # Convertir predicción de edad a entero
+    scaler = get_scaler()
+    edad = scaler.inverse_transform(edad_pred.reshape(-1, 1))[0][0] if scaler is not None else edad_pred[0][0]
     return genero, edad
 
 captura = cv2.VideoCapture(0)  
