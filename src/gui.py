@@ -5,18 +5,21 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.applications.imagenet_utils import preprocess_input
 import sys
+import os
+import joblib
 
 # Asegurarse de que la salida estándar use UTF-8
 sys.stdout.reconfigure(encoding='utf-8')
 
 # Cargar el modelo de Keras
-modelo_path = "D:/progra/IAJHON/AgeGenderDetection/models/1000imagenes.keras"
+current_dir = os.path.dirname(os.path.abspath(__file__))
+modelo_path = os.path.join(current_dir, '..', 'models', '1000imagenes.keras')
+scaler = joblib.load(os.path.join(current_dir, '..', 'scales', '1000imagenes.pkl'))
 model = load_model(modelo_path)
 print(f"Modelo cargado desde: {modelo_path}")
 
 # Cargar el clasificador de rostros de OpenCV
 clasificador_rostros = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-
 
 # Función para predecir género y edad
 def predecir_genero_edad(rostro):
@@ -47,7 +50,8 @@ while True:
         rostro_color = frame[y:y + h, x:x + w]
         genero, edad = predecir_genero_edad(rostro_color)
         age_pred = np.array([[edad]])
-        scaler = get_scaler()
+        # scaler = get_scaler()
+        print(genero, edad, age_pred)
         edad = scaler.inverse_transform(age_pred.reshape(-1, 1))[0][0] if scaler is not None else age_pred[0][0]
         texto = f"{genero}, {edad} anios".encode('ascii', 'ignore').decode('ascii')
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
