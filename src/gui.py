@@ -6,7 +6,6 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.applications.imagenet_utils import preprocess_input
 import sys
-import os
 import joblib
 
 # Asegurarse de que la salida estándar use UTF-8
@@ -31,6 +30,7 @@ def predecir_genero_edad(rostro):
     genero = "Mujer" if genero_pred[0] > 0.5 else "Hombre"
     scaler = get_scaler()
     edad = scaler.inverse_transform(edad_pred.reshape(-1, 1))[0][0] if scaler is not None else edad_pred[0][0]
+    edad = round(edad,1)
     return genero, edad
 
 captura = cv2.VideoCapture(0)
