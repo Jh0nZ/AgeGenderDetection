@@ -4,12 +4,14 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.applications.imagenet_utils import preprocess_input
 import sys
+import joblib
 
 # Asegurarse de que la salida estándar use UTF-8
 sys.stdout.reconfigure(encoding='utf-8')
 
 # Cargar el modelo de Keras
-modelo_path = "D:/progra/IAJHON/AgeGenderDetection/models/1000imagenes.keras"
+modelo_path = "../models/1000imagenes.keras"
+scaler = joblib.load("../scales/1000imagenes.pkl")
 model = load_model(modelo_path)
 print(f"Modelo cargado desde: {modelo_path}")
 
@@ -47,6 +49,8 @@ while True:
         
         # Predicción de género y edad
         genero, edad = predecir_genero_edad(rostro_color)
+        age_pred = np.array([[edad]])
+        edad = scaler.inverse_transform(age_pred.reshape(-1, 1))[0][0] if scaler is not None else age_pred[0][0]
 
         # Reemplazar caracteres no codificables (si hay) en el texto
         texto = f"{genero}, {edad} anios".encode('ascii', 'ignore').decode('ascii')
