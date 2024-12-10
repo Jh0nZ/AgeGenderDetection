@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import os
 from model_loader import get_model, get_scaler
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
@@ -8,9 +9,8 @@ import sys
 
 # Asegurarse de que la salida estándar use UTF-8
 sys.stdout.reconfigure(encoding='utf-8')
-
-# Cargar el modelo de Keras
-modelo_path = "D:/progra/IAJHON/AgeGenderDetection/models/1000imagenes.keras"
+current_dir = os.path.dirname(os.path.abspath(__file__))
+modelo_path = os.path.join(current_dir, "../models/1000imagenes.keras")
 model = load_model(modelo_path)
 print(f"Modelo cargado desde: {modelo_path}")
 
